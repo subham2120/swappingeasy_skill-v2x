@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f5f6fa;
+}
+
+h2, h3 {
+  color: #222;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ===== SKILL GRID ===== */
+.skill-grid {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Mobile → 1 card */
+@media (max-width: 767px) {
+  .skill-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Laptop / Desktop → 3 cards */
+@media (min-width: 768px) {
+  .skill-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

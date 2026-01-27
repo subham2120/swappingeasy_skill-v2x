@@ -1,0 +1,27 @@
+.skill-grid {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+
+/* ===== DESKTOP / LAPTOP ===== */
+@media (min-width: 1024px) {
+  .skill-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== TABLET ===== */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .skill-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 599px) {
+  .skill-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+}

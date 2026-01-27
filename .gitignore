@@ -1,0 +1,18 @@
+# IntelliJ
+.idea/
+
+# React
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# Spring Boot
+backend/target/
+backend/.env
+
+# Uploads (images, user files)
+uploads/
+
+# OS
+.DS_Store
+
