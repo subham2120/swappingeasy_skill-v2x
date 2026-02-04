@@ -27,6 +27,19 @@ public class User {
     @Column(length = 255)
     private String bio;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    // 🟢 ADD THESE METHODS
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+
 
     // getters & setters
     public Long getId() {

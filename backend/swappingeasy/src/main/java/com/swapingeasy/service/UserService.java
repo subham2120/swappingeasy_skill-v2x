@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.swapingeasy.entity.User;
 import com.swapingeasy.repository.UserRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,13 +20,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ExchangeRepository exchangeRepository;
+    private final ExchangeService exchangeService;
+
 
     public UserService(UserRepository userRepository,
                        SkillRepository skillRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       ExchangeService exchangeService, ExchangeRepository exchangeRepository, ExchangeRepository exchangeRepository1) {
         this.userRepository = userRepository;
         this.skillRepository = skillRepository;
         this.passwordEncoder = passwordEncoder;
+        this.exchangeService = exchangeService;
+        this.exchangeRepository = exchangeRepository1;
     }
 
     public User register(RegisterRequest request) {
@@ -73,9 +80,11 @@ public class UserService {
         PublicProfileResponse response = new PublicProfileResponse();
         response.setUserId(user.getId());
         response.setUsername(user.getName());
-        response.setProfileImage(null);
+        response.setProfileImage(user.getProfileImage());
         response.setSkills(skillResponses);
-
+        response.setBio(user.getBio());
+        response.setExchangeCount(getExchangeCount(userId));
+        response.setConnectionCount( getExchangeCount(userId));
         return response;
     }
 
@@ -89,7 +98,7 @@ public class UserService {
         userRepository.save(user);
     }
     public long getExchangeCount(Long userId) {
-        ExchangeRepository exchangeRepository = null;
+
         long asRequester =
                 exchangeRepository.countByRequesterIdAndStatus(
                         userId,
@@ -103,6 +112,10 @@ public class UserService {
                 );
 
         return asRequester + asOwner;
+    }
+
+    public String uploadProfileImage(Long userId, MultipartFile file) {
+        throw new UnsupportedOperationException("Handled in controller");
     }
 
 

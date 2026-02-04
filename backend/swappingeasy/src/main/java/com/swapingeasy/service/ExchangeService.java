@@ -136,11 +136,13 @@ public class ExchangeService {
     }
 
     public long getConnectionCount(Long userId) {
-        return exchangeRepository.countByStatusAndOwnerIdOrRequesterId(
-                ExchangeStatus.ACCEPTED,
+        return exchangeRepository.countByOwnerIdOrRequesterIdAndStatusIn(
                 userId,
-                userId
+                userId,
+                List.of(ExchangeStatus.PENDING, ExchangeStatus.REJECTED)
         );
     }
+
+
 
 }

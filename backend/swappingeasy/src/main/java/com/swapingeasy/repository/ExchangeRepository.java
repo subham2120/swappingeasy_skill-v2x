@@ -3,6 +3,8 @@ package com.swapingeasy.repository;
 import com.swapingeasy.entity.Exchange;
 import com.swapingeasy.entity.ExchangeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -37,5 +39,13 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
             Long ownerId,
             Long requesterId
     );
+
+    long countByOwnerIdOrRequesterIdAndStatusIn(
+            Long ownerId,
+            Long requesterId,
+            List<ExchangeStatus> statuses
+    );
+
+
 
 }

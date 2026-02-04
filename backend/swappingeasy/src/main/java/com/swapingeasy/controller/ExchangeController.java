@@ -53,4 +53,10 @@ public class ExchangeController {
     public void delete(@PathVariable Long id) {
         exchangeService.deleteExchange(id);
     }
+    @GetMapping("/connections/{userId}")
+    public long getConnectionCount(@PathVariable Long userId) {
+        return exchangeService.getConnectionCount(userId);
+    }
+
+
 }

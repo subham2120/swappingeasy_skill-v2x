@@ -51,7 +51,7 @@ public class MessageService {
                         ExchangeStatus.ACCEPTED
                 )
                         ||
-                        exchangeRepository.existsByOwnerIdAndRequesterIdAndStatus(
+                        exchangeRepository.existsByRequesterIdAndOwnerIdAndStatus(
                                 receiverId,
                                 senderId,
                                 ExchangeStatus.ACCEPTED

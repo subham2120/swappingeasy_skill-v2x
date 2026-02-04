@@ -5,24 +5,7 @@ public class UpdateProfileRequest {
     private String username;
     private String bio;
 
-    public long getExchangeCount() {
-        return exchangeCount;
-    }
 
-    public void setExchangeCount(long exchangeCount) {
-        this.exchangeCount = exchangeCount;
-    }
-
-    public long getConnectionCount() {
-        return connectionCount;
-    }
-
-    public void setConnectionCount(long connectionCount) {
-        this.connectionCount = connectionCount;
-    }
-
-    private long exchangeCount;
-    private long connectionCount;
 
 
     public String getUsername() {

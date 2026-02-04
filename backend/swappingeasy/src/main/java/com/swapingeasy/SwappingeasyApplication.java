@@ -10,4 +10,3 @@ public class SwappingeasyApplication {
 		SpringApplication.run(SwappingeasyApplication.class, args);
 	}
 }
-
