@@ -8,8 +8,8 @@ function MyExchanges() {
 
   const [sent, setSent] = useState([]);
   const [received, setReceived] = useState([]);
+  const [activeTab, setActiveTab] = useState("SENT");
 
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     if (!userId) return;
 
@@ -22,23 +22,17 @@ function MyExchanges() {
       .catch(() => setReceived([]));
   }, [userId]);
 
-  /* ================= ACTIONS ================= */
-
   const acceptExchange = async (id) => {
     await api.put(`/exchange/accept/${id}`);
     setReceived(prev =>
-      prev.map(e =>
-        e.id === id ? { ...e, status: "ACCEPTED" } : e
-      )
+      prev.map(e => e.id === id ? { ...e, status: "ACCEPTED" } : e)
     );
   };
 
   const rejectExchange = async (id) => {
     await api.put(`/exchange/reject/${id}`);
     setReceived(prev =>
-      prev.map(e =>
-        e.id === id ? { ...e, status: "REJECTED" } : e
-      )
+      prev.map(e => e.id === id ? { ...e, status: "REJECTED" } : e)
     );
   };
 
@@ -47,135 +41,156 @@ function MyExchanges() {
     setSent(prev => prev.filter(e => e.id !== id));
   };
 
-  /* ================= STATUS STYLE ================= */
-
   const statusStyle = (status) => ({
     padding: "4px 10px",
     borderRadius: "12px",
     color: "white",
     fontSize: "12px",
-    display: "inline-block",
     backgroundColor:
-      status === "PENDING"
-        ? "#f39c12"
-        : status === "ACCEPTED"
-        ? "#27ae60"
-        : "#e74c3c"
+      status === "PENDING" ? "#f39c12"
+      : status === "ACCEPTED" ? "#27ae60"
+      : "#e74c3c"
   });
 
-  if (!userId) {
-    return <h3 style={{ textAlign: "center" }}>Please login</h3>;
-  }
+  const typeBadge = (e) => ({
+    padding: "2px 8px",
+    borderRadius: "10px",
+    fontSize: "11px",
+    marginLeft: "8px",
+    color: "white",
+    backgroundColor: e.requestedSkillTitle ? "#2980b9" : "#8e44ad"
+  });
+
+  if (!userId) return <h3 style={{ textAlign: "center" }}>Please login</h3>;
 
   return (
-    <div style={{ maxWidth: "900px", margin: "auto", padding: "30px" }}>
-      <h2>🔁 My Exchanges</h2>
+   <div
+     style={{
+       maxWidth: "1100px",
+       marginTop: "30px",   // navbar height
+       marginLeft: "250px", // 🔥 sidebar width (same as slider)
+       padding: "30px"
+     }}
+   >
 
-      {/* ================= SENT ================= */}
-      <h3 style={{ marginTop: "30px" }}>📤 Sent Requests</h3>
-      {sent.length === 0 && <p>No sent requests</p>}
+      <h2 style={{ textAlign: "center" }}>🔁 My Exchanges</h2>
 
-      {sent.map(e => (
-        <div key={e.id} style={cardStyle}>
-          <p><b>Requested Skill:</b> {e.requestedSkillTitle}</p>
-          <p><b>To:</b> {e.ownerName}</p>
+      {/* TABS */}
+      <div style={{ display: "flex", justifyContent: "center", gap: "12px", margin: "20px 0" }}>
+        <button
+          onClick={() => setActiveTab("SENT")}
+          style={{ ...tabBtn, background: activeTab === "SENT" ? "#3897f0" : "#eee", color: activeTab === "SENT" ? "#fff" : "#333" }}
+        >
+          📤 Sent
+        </button>
+        <button
+          onClick={() => setActiveTab("RECEIVED")}
+          style={{ ...tabBtn, background: activeTab === "RECEIVED" ? "#3897f0" : "#eee", color: activeTab === "RECEIVED" ? "#fff" : "#333" }}
+        >
+          📥 Received
+        </button>
+      </div>
 
-          <span style={statusStyle(e.status)}>{e.status}</span>
+      {/* ===== GRID START ===== */}
+      <div style={gridStyle}>
+        {activeTab === "SENT" && sent.map(e => (
+          <div key={e.id} style={cardStyle}>
+            <p>
+              <b>Requested:</b> {e.requestedSkillTitle || e.requestedProductTitle}
+              <span style={typeBadge(e)}>
+                {e.requestedSkillTitle ? "SKILL" : "PRODUCT"}
+              </span>
+            </p>
 
-          {/* CHAT ONLY AFTER ACCEPT */}
-          {e.status === "ACCEPTED" && (
-            <div style={{ marginTop: "10px" }}>
-              <button
-                style={chatBtn}
-                onClick={() =>
-                  navigate(
-                    `/messages?name=${encodeURIComponent(e.ownerName)}`
-                  )
-                }
-              >
+            <p><b>To:</b> {e.ownerName}</p>
+            <span style={statusStyle(e.status)}>{e.status}</span>
+
+            {e.status === "ACCEPTED" && (
+              <button style={chatBtn} onClick={() => navigate(`/messages?name=${e.ownerName}`)}>
                 💬 Chat
               </button>
-            </div>
-          )}
+            )}
 
-          {e.status === "PENDING" && (
-            <div>
-              <button onClick={() => deleteExchange(e.id)} style={deleteBtn}>
-                ❌ Delete Request
+            {e.status === "PENDING" && (
+              <button style={deleteBtn} onClick={() => deleteExchange(e.id)}>
+                ❌ Delete
               </button>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
 
-      {/* ================= RECEIVED ================= */}
-      <h3 style={{ marginTop: "40px" }}>📥 Received Requests</h3>
-      {received.length === 0 && <p>No received requests</p>}
+        {activeTab === "RECEIVED" && received.map(e => (
+          <div key={e.id} style={cardStyle}>
+            <p>
+              <b>Your Item:</b> {e.requestedSkillTitle || e.requestedProductTitle}
+              <span style={typeBadge(e)}>
+                {e.requestedSkillTitle ? "SKILL" : "PRODUCT"}
+              </span>
+            </p>
 
-      {received.map(e => (
-        <div key={e.id} style={cardStyle}>
-          <p><b>Your Skill:</b> {e.requestedSkillTitle}</p>
-          <p><b>From:</b> {e.requesterName}</p>
-          <p><b>Offered Skill:</b> {e.offeredSkillTitle}</p>
+            <p><b>From:</b> {e.requesterName}</p>
+            <p><b>Offered:</b> {e.offeredSkillTitle || e.offeredProductTitle}</p>
 
-          <span style={statusStyle(e.status)}>{e.status}</span>
+            <span style={statusStyle(e.status)}>{e.status}</span>
 
-          {e.status === "PENDING" && (
-            <div style={{ marginTop: "10px" }}>
-              <button onClick={() => acceptExchange(e.id)} style={acceptBtn}>
-                Accept
-              </button>
-              <button onClick={() => rejectExchange(e.id)} style={rejectBtn}>
-                Reject
-              </button>
-            </div>
-          )}
+            {e.status === "PENDING" && (
+              <div style={{ marginTop: "10px" }}>
+                <button style={acceptBtn} onClick={() => acceptExchange(e.id)}>Accept</button>
+                <button style={rejectBtn} onClick={() => rejectExchange(e.id)}>Reject</button>
+              </div>
+            )}
 
-          {/* CHAT ONLY AFTER ACCEPT */}
-          {e.status === "ACCEPTED" && (
-            <div style={{ marginTop: "10px" }}>
-              <button
-                style={chatBtn}
-                onClick={() =>
-                  navigate(
-                    `/messages?name=${encodeURIComponent(e.requesterName)}`
-                  )
-                }
-              >
+            {e.status === "ACCEPTED" && (
+              <button style={chatBtn} onClick={() => navigate(`/messages?name=${e.requesterName}`)}>
                 💬 Chat
               </button>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
+      </div>
+      {/* ===== GRID END ===== */}
     </div>
   );
 }
 
 /* ================= STYLES ================= */
 
+const gridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)", // 🔥 3 COLUMN
+  gap: "20px",
+  marginTop: "20px"
+};
+
+const tabBtn = {
+  padding: "8px 18px",
+  borderRadius: "20px",
+  border: "none",
+  cursor: "pointer",
+  fontWeight: "500"
+};
+
 const cardStyle = {
-  padding: "15px",
-  marginBottom: "15px",
-  borderRadius: "10px",
+  padding: "16px",
+  borderRadius: "12px",
   backgroundColor: "#fff",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+  boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
 };
 
 const acceptBtn = {
+  marginRight: "10px",
   padding: "6px 12px",
-  backgroundColor: "#27ae60",
-  color: "white",
+  background: "#27ae60",
+  color: "#fff",
   border: "none",
   borderRadius: "6px",
-  cursor: "pointer",
-  marginRight: "10px"
+  cursor: "pointer"
 };
 
 const rejectBtn = {
   padding: "6px 12px",
-  backgroundColor: "#e74c3c",
-  color: "white",
+  background: "#e74c3c",
+  color: "#fff",
   border: "none",
   borderRadius: "6px",
   cursor: "pointer"
@@ -184,17 +199,18 @@ const rejectBtn = {
 const deleteBtn = {
   marginTop: "10px",
   padding: "6px 12px",
-  backgroundColor: "#c0392b",
-  color: "white",
+  background: "#c0392b",
+  color: "#fff",
   border: "none",
   borderRadius: "6px",
   cursor: "pointer"
 };
 
 const chatBtn = {
+  marginTop: "10px",
   padding: "6px 14px",
-  backgroundColor: "#3897f0",
-  color: "white",
+  background: "#3897f0",
+  color: "#fff",
   border: "none",
   borderRadius: "6px",
   cursor: "pointer"

@@ -7,10 +7,7 @@ import com.swapingeasy.dto.ExchangeResponse;
 import com.swapingeasy.entity.Conversation;
 import com.swapingeasy.entity.Exchange;
 import com.swapingeasy.entity.ExchangeStatus;
-import com.swapingeasy.repository.ConversationRepository;
-import com.swapingeasy.repository.ExchangeRepository;
-import com.swapingeasy.repository.SkillRepository;
-import com.swapingeasy.repository.UserRepository;
+import com.swapingeasy.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,23 +18,35 @@ public class ExchangeService {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final ConversationRepository conversationRepository;
+    private final ProductRepository productRepository;
+
+    private final NotificationService notificationService;
 
     public ExchangeService(
             ExchangeRepository exchangeRepository,
             UserRepository userRepository,
             SkillRepository skillRepository,
-            ConversationRepository conversationRepository
-    ) {
+            ConversationRepository conversationRepository,
+            ProductRepository productRepository, NotificationService notificationService) {
         this.exchangeRepository = exchangeRepository;
         this.userRepository = userRepository;
         this.skillRepository = skillRepository;
         this.conversationRepository = conversationRepository;
+        this.productRepository = productRepository;
+        this.notificationService = notificationService;
     }
 
     // ✅ CREATE
     public Exchange createExchange(Exchange exchange) {
         exchange.setStatus(ExchangeStatus.PENDING);
-        return exchangeRepository.save(exchange);
+        Exchange savedExchange = exchangeRepository.save(exchange);
+
+        notificationService.create(
+                exchange.getOwnerId(),
+                "New exchange request received",
+                "EXCHANGE_REQUEST"
+        );
+        return savedExchange;
     }
 
     // ✅ ACCEPT (🔥 MAIN FIX HERE)
@@ -53,7 +62,6 @@ public class ExchangeService {
         Long requesterId = exchange.getRequesterId();
         Long ownerId = exchange.getOwnerId();
 
-        // 🔥 CHECK EXISTING CONVERSATION (CORRECT METHOD)
         Optional<Conversation> existing =
                 conversationRepository.findBetweenUsers(requesterId, ownerId);
 
@@ -61,10 +69,13 @@ public class ExchangeService {
             Conversation conversation = new Conversation();
             conversation.setUser1Id(requesterId);
             conversation.setUser2Id(ownerId);
-            // ❌ user_low / user_high SET MAT KARO (DB GENERATED)
             conversationRepository.save(conversation);
         }
-
+        notificationService.create(
+                requesterId,
+                "Your exchange request has been accepted",
+                "EXCHANGE_ACCEPTED"
+        );
         return exchange;
     }
 
@@ -73,7 +84,13 @@ public class ExchangeService {
         Exchange exchange = exchangeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exchange not found"));
         exchange.setStatus(ExchangeStatus.REJECTED);
-        return exchangeRepository.save(exchange);
+        Exchange saved =exchangeRepository.save(exchange);
+        notificationService.create(
+                exchange.getRequesterId(),
+                "Your exchange request has been rejected",
+                "EXCHANGE_REJECTED"
+        );
+        return saved;
     }
 
     // ✅ DELETE
@@ -104,18 +121,39 @@ public class ExchangeService {
                         .orElse("Unknown User")
         );
 
-        res.setRequestedSkillTitle(
-                skillRepository.findById(e.getRequestedSkillId())
-                        .map(s -> s.getTitle())
-                        .orElse("Unknown Skill")
-        );
+        if (e.getRequestedSkillId() != null) {
+            res.setRequestedSkillTitle(
+                    skillRepository.findById(e.getRequestedSkillId())
+                            .map(s -> s.getTitle())
+                            .orElse("Unknown Skill")
+            );
+        }
 
-        res.setOfferedSkillTitle(
-                skillRepository.findById(e.getOfferedSkillId())
-                        .map(s -> s.getTitle())
-                        .orElse("Unknown Skill")
-        );
+        if (e.getOfferedSkillId() != null) {
+            res.setOfferedSkillTitle(
+                    skillRepository.findById(e.getOfferedSkillId())
+                            .map(s -> s.getTitle())
+                            .orElse("Unknown Skill")
+            );
+        }
 
+
+
+        if (e.getRequestedProductId() != null) {
+            res.setRequestedProductTitle(
+                    productRepository.findById(e.getRequestedProductId())
+                            .map(p -> p.getTitle())
+                            .orElse("Unknown Product")
+            );
+        }
+
+        if (e.getOfferedProductId() != null) {
+            res.setOfferedProductTitle(
+                    productRepository.findById(e.getOfferedProductId())
+                            .map(p -> p.getTitle())
+                            .orElse("Unknown Product")
+            );
+        }
         return res;
     }
 

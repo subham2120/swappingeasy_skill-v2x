@@ -1,74 +1,78 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/RightSidebar.css";
+import {
+  FaHome,
+  FaUser,
+  FaComments,
+  FaPlusCircle,
+  FaBox,
+  FaExchangeAlt,
+  FaChartBar,
+  FaBell,
+  FaSignOutAlt
+} from "react-icons/fa";
 
 function RightSidebar() {
-  const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
+const navigate = useNavigate();
+const userId = localStorage.getItem("userId");
+const username = localStorage.getItem("username");
 
-  // Agar login nahi hai → sidebar hi mat dikhao
-  if (!userId) return null;
+if (!userId) return null;
 
-  const Item = ({ label, path, onClick }) => (
-    <div
-      onClick={onClick ? onClick : () => navigate(path)}
-      style={{
-        padding: "12px 10px",
-        cursor: "pointer",
-        borderRadius: "6px",
-        marginBottom: "8px",
-        fontWeight: "500"
-      }}
-      onMouseOver={e => e.currentTarget.style.background = "#f0f0f0"}
-      onMouseOut={e => e.currentTarget.style.background = "transparent"}
-    >
+const logout = () => {
+localStorage.removeItem("userId");
+localStorage.removeItem("username");
+navigate("/login");
+};
+
+const Item = ({ icon, label, path, onClick }) => (
+  <div
+    className="sidebar-item"
+    onClick={onClick ? onClick : () => navigate(path)}
+  >
+    <span className="sidebar-icon">
+      {icon}
+    </span>
+
+    <span>
       {label}
+    </span>
+  </div>
+);
+
+return ( <div className="sidebar">
+  <div className="user-panel">
+
+    <div className="sidebar-avatar">
+      {username?.charAt(0).toUpperCase()}
     </div>
-  );
 
-  // 🔴 LOGOUT FUNCTION
-  const logout = () => {
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
-    navigate("/login");
-  };
+    <h5>{username}</h5>
 
-  return (
-    <div
-      style={{
-        width: "230px",
-        borderLeft: "1px solid #ddd",
-        background: "#fff",
-        padding: "20px",
-        height: "100vh",
-        position: "sticky",
-        top: 0
-      }}
-    >
-      <h2 style={{ marginBottom: "25px" }}>SwapingEasy</h2>
+  </div>
 
-      {/* 🔹 MAIN NAV */}
-      <Item label="🏠 Home" path="/" />
-      <Item label="👤 Profile" path="/profile" />
-      <Item label="💬 Messages" path="/messages" />
 
-      <hr style={{ margin: "15px 0" }} />
+ <Item icon={<FaHome />} label="Home" path="/" />
+ <Item icon={<FaUser />} label="Profile" path="/profile" />
+ <Item icon={<FaComments />} label="Messages" path="/messages" />
 
-      {/* 🔹 ACTIONS */}
-      <Item label="➕ Add Skill" path="/add-skill" />
-      <Item label="🔁 My Exchanges" path="/my-exchanges" />
 
-      <hr style={{ margin: "15px 0" }} />
 
-      {/* 🔹 EXTRA */}
-      <Item label="📊 Dashboard" path="/dashboard" />
-      <Item label="🔔 Notifications" path="/notifications" />
+ <Item icon={<FaPlusCircle />} label="Add Skill" path="/add-skill" />
+ <Item icon={<FaBox />} label="Add Product" path="/add-product" />
+ <Item icon={<FaExchangeAlt />} label="My Exchanges" path="/my-exchanges" />
 
-      <hr style={{ margin: "15px 0" }} />
 
-      {/* 🔴 LOGOUT (ONLY HERE) */}
-      <Item label="🚪 Logout" onClick={logout} />
-    </div>
-  );
+
+<Item icon={<FaChartBar />} label="Dashboard" path="/dashboard" />
+<Item icon={<FaBell />} label="Notifications" path="/notifications" />
+
+<Item icon={<FaSignOutAlt />} label="Logout" onClick={logout} />
+
+</div>
+
+);
 }
 
 export default RightSidebar;

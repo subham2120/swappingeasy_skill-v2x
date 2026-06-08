@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import SkillCard from "../components/SkillCard";
+import "../styles/Profile.css";
 
 function Profile() {
   const { userId } = useParams();
@@ -15,23 +16,27 @@ function Profile() {
 
   const [profile, setProfile] = useState(null);
   const [skills, setSkills] = useState([]);
+  const [products, setProducts] = useState([]);
   const [connections, setConnections] = useState(0);
 
-  // 🔹 Edit profile state
   const [showEdit, setShowEdit] = useState(false);
   const [editUsername, setEditUsername] = useState("");
   const [editBio, setEditBio] = useState("");
 
-  /* ================= LOAD PROFILE + CONNECTIONS ================= */
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
   useEffect(() => {
-    // profile
     api.get(`/users/${profileUserId}/public-profile`)
       .then(res => {
         setProfile(res.data);
         setSkills(res.data.skills || []);
       });
 
-    // connections count
+    api.get(`/products/user/${profileUserId}`)
+      .then(res => setProducts(res.data))
+      .catch(() => setProducts([]));
+
     api.get(`/exchange/connections/${profileUserId}`)
       .then(res => setConnections(res.data))
       .catch(() => setConnections(0));
@@ -42,29 +47,79 @@ function Profile() {
   }
 
   return (
-    <div style={{ maxWidth: "950px", margin: "30px auto", padding: "0 20px" }}>
+    <div className="profile-container">
 
-      {/* ================= PROFILE HEADER ================= */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "30px" }}>
+      <input
+        type="file"
+        accept="image/*"
+        id="profileImageInput"
+        style={{ display: "none" }}
+        onChange={async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
 
-        {/* Avatar */}
+          const formData = new FormData();
+          formData.append("file", file);
+
+          try {
+            setUploading(true);
+            const res = await api.post(
+              `/users/${profileUserId}/profile-image`,
+              formData,
+              { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            setProfile(prev => ({ ...prev, profileImage: res.data }));
+          } catch {
+            alert("Image upload failed");
+          } finally {
+            setUploading(false);
+            setShowAvatarMenu(false);
+          }
+        }}
+      />
+
+      <div className="ig-header">
         <div
-          style={avatarStyle}
-          onClick={() => alert("Profile photo upload (frontend only)")}
+          className="ig-avatar"
+          onClick={() => isOwnProfile && setShowAvatarMenu(!showAvatarMenu)}
         >
-          {profile.username?.charAt(0).toUpperCase()}
+          {profile.profileImage ? (
+            <img src={profile.profileImage} alt="profile" className="ig-avatar-img" />
+          ) : (
+            <span>{uploading ? "..." : profile.username?.charAt(0).toUpperCase()}</span>
+          )}
+
+          {showAvatarMenu && isOwnProfile && (
+            <div className="avatar-menu">
+              <div
+                className="avatar-menu-item"
+                onClick={() =>
+                  document.getElementById("profileImageInput").click()
+                }
+              >
+                Change Profile Photo
+              </div>
+
+              <div
+                className="avatar-menu-item cancel"
+                onClick={() => setShowAvatarMenu(false)}
+              >
+                Cancel
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Info */}
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-            <h2 style={{ marginRight: "20px" }}>
+        <div className="profile-info">
+          <div className="ig-top-row">
+            <h2>
               {isOwnProfile ? loggedInUsername : profile.username}
             </h2>
 
             {isOwnProfile && (
               <button
-                style={btnStyle}
+                className="ig-btn"
                 onClick={() => {
                   setEditUsername(profile.username);
                   setEditBio(profile.bio || "");
@@ -77,69 +132,61 @@ function Profile() {
 
             {!isOwnProfile && (
               <button
+                className="ig-btn message-btn"
                 onClick={() =>
                   navigate(`/messages?userId=${profileUserId}&name=${profile.username}`)
                 }
-                style={{
-                  ...btnStyle,
-                  background: "#3897f0",
-                  color: "white",
-                  border: "none",
-                  marginLeft: "10px"
-                }}
               >
                 Message
               </button>
             )}
           </div>
 
-          {/* 🔥 STATS */}
-          <div style={statsContainer}>
-            <StatCard icon="🛠️" value={skills.length} label="Skills" color="#3897f0" />
-            <StatCard icon="🤝" value={connections} label="Connections" color="#ff9800" />
+          <div className="ig-stats">
+            <span><b>{skills.length}</b> skills</span>
+            <span><b>{products.length}</b> products</span>
+            <span><b>{connections}</b> connections</span>
+            <span><b>{profile.exchangeCount || 0}</b> exchanges</span>
           </div>
 
-          {/* Bio */}
-          <div style={{ marginTop: "10px" }}>
+          <div className="profile-bio">
             <b>{profile.username}</b>
-            <p style={{ margin: "4px 0", color: "#555" }}>
-              {profile.bio?.trim() || "Learn and Grow"}
-            </p>
+            <p>{profile.bio?.trim() || "Learn • Share • Grow"}</p>
           </div>
         </div>
       </div>
 
       <hr />
 
-      {/* ================= SKILLS GRID ================= */}
-      <div style={skillsGrid}>
+      <h3>Skills</h3>
+      <div className="skills-grid">
         {skills.map(skill => (
+          <SkillCard key={`skill-${skill.id}`} skill={skill} hideUser grid />
+        ))}
+      </div>
+
+      <h3 className="products-title">Products</h3>
+      <div className="skills-grid">
+        {products.map(product => (
           <SkillCard
-            key={skill.id}
-            skill={skill}
-            hideUser={true}
-            grid={true}
+            key={`product-${product.id}`}
+            skill={product}
+            type="PRODUCT"
+            hideUser
+            grid
           />
         ))}
       </div>
 
-      {skills.length === 0 && (
-        <p style={{ textAlign: "center", marginTop: "40px", color: "#777" }}>
-          No skills added yet
-        </p>
-      )}
-
-      {/* ================= EDIT PROFILE MODAL ================= */}
       {showEdit && (
-        <div style={modalOverlay}>
-          <div style={modalBox}>
+        <div className="modal-overlay">
+          <div className="modal-box">
             <h2>Edit Profile</h2>
 
             <input
               value={editUsername}
-              onChange={e => setEditUsername(e.target.value)}
-              placeholder="Username"
-              style={inputStyle}
+              disabled
+              className="input-style"
             />
 
             <textarea
@@ -147,33 +194,24 @@ function Profile() {
               onChange={e => setEditBio(e.target.value)}
               placeholder="Bio"
               rows={3}
-              style={inputStyle}
+              className="input-style"
             />
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-              <button style={btnStyle} onClick={() => setShowEdit(false)}>
+            <div className="modal-actions">
+              <button
+                className="btn-style"
+                onClick={() => setShowEdit(false)}
+              >
                 Cancel
               </button>
 
               <button
-                style={{
-                  ...btnStyle,
-                  background: "#3897f0",
-                  color: "white",
-                  border: "none"
-                }}
+                className="btn-style save-btn"
                 onClick={async () => {
                   await api.put(`/users/${profileUserId}/profile`, {
-                    username: editUsername,
                     bio: editBio
                   });
-
-                  setProfile({
-                    ...profile,
-                    username: editUsername,
-                    bio: editBio
-                  });
-
+                  setProfile(prev => ({ ...prev, bio: editBio }));
                   setShowEdit(false);
                 }}
               >
@@ -183,95 +221,8 @@ function Profile() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
-
-/* ================= COMPONENTS ================= */
-
-const StatCard = ({ icon, value, label, color }) => (
-  <div style={{
-    flex: 1,
-    background: "#fff",
-    borderRadius: "12px",
-    padding: "14px",
-    textAlign: "center",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    borderTop: `4px solid ${color}`
-  }}>
-    <div style={{ fontSize: "22px" }}>{icon}</div>
-    <h3 style={{ margin: "6px 0" }}>{value}</h3>
-    <span style={{ fontSize: "14px", color: "#777" }}>{label}</span>
-  </div>
-);
-
-/* ================= STYLES ================= */
-
-const avatarStyle = {
-  width: "150px",
-  height: "150px",
-  borderRadius: "50%",
-  backgroundColor: "#3897f0",
-  color: "white",
-  fontSize: "60px",
-  fontWeight: "bold",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginRight: "40px",
-  cursor: "pointer"
-};
-
-const btnStyle = {
-  padding: "6px 16px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  background: "#fff",
-  cursor: "pointer",
-  fontWeight: "500"
-};
-
-const statsContainer = {
-  display: "flex",
-  gap: "16px",
-  marginBottom: "10px"
-};
-
-const skillsGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-  gap: "20px",
-  marginTop: "30px"
-};
-
-const modalOverlay = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  background: "rgba(0,0,0,0.4)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000
-};
-
-const modalBox = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "12px",
-  width: "360px",
-  boxShadow: "0 8px 20px rgba(0,0,0,0.25)"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "8px",
-  marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #ccc"
-};
 
 export default Profile;

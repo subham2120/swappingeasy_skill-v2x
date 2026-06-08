@@ -18,6 +18,11 @@ public class ExchangeResponse {
     private String requestedSkillTitle;
     private String offeredSkillTitle;
 
+
+
+    private String requestedProductTitle;
+    private String offeredProductTitle;
+
     // ===== GETTERS & SETTERS =====
 
     public Long getId() {
@@ -82,5 +87,21 @@ public class ExchangeResponse {
 
     public void setOfferedSkillTitle(String offeredSkillTitle) {
         this.offeredSkillTitle = offeredSkillTitle;
+    }
+
+    public String getRequestedProductTitle() {
+        return requestedProductTitle;
+    }
+
+    public void setRequestedProductTitle(String requestedProductTitle) {
+        this.requestedProductTitle = requestedProductTitle;
+    }
+
+    public String getOfferedProductTitle() {
+        return offeredProductTitle;
+    }
+
+    public void setOfferedProductTitle(String offeredProductTitle) {
+        this.offeredProductTitle = offeredProductTitle;
     }
 }

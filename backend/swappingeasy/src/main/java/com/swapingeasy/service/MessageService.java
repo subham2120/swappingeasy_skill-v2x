@@ -2,14 +2,13 @@ package com.swapingeasy.service;
 
 import com.swapingeasy.dto.MessageRequest;
 import com.swapingeasy.entity.Conversation;
-import com.swapingeasy.entity.ExchangeStatus;
 import com.swapingeasy.entity.Message;
 import com.swapingeasy.repository.ExchangeRepository;
 import com.swapingeasy.repository.MessageRepository;
 import com.swapingeasy.repository.ConversationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.util.List;
 
 @Service
@@ -19,17 +18,20 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ExchangeRepository exchangeRepository;
     private final ConversationRepository conversationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public MessageService(
             ConversationService conversationService,
             MessageRepository messageRepository,
             ExchangeRepository exchangeRepository,
-            ConversationRepository conversationRepository
-    ) {
+            ConversationRepository conversationRepository,
+            SimpMessagingTemplate messagingTemplate) {
+
         this.conversationService = conversationService;
         this.messageRepository = messageRepository;
         this.exchangeRepository = exchangeRepository;
         this.conversationRepository = conversationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public List<Message> getMessages(Long conversationId) {
@@ -45,17 +47,10 @@ public class MessageService {
 
         // ✅ STEP 1: ACCEPTED exchange check (BOTH DIRECTIONS)
         boolean allowed =
-                exchangeRepository.existsByOwnerIdAndRequesterIdAndStatus(
+                exchangeRepository.canChat(
                         senderId,
-                        receiverId,
-                        ExchangeStatus.ACCEPTED
-                )
-                        ||
-                        exchangeRepository.existsByRequesterIdAndOwnerIdAndStatus(
-                                receiverId,
-                                senderId,
-                                ExchangeStatus.ACCEPTED
-                        );
+                        receiverId
+                );
 
         if (!allowed) {
             throw new RuntimeException(
@@ -74,11 +69,17 @@ public class MessageService {
         message.setReceiverId(receiverId);
         message.setContent(request.getContent());
 
-        messageRepository.save(message);
+        Message savedMessage =
+                messageRepository.save(message);
 
         // ✅ STEP 4: Update last_message only
         conversation.setLastMessage(request.getContent());
         conversationRepository.save(conversation);
-        // ❌ updatedAt ko mat chhedo (DB auto handle karega)
+
+
+        messagingTemplate.convertAndSend(
+                "/topic/chat/" + conversation.getId(),
+                savedMessage
+        );
     }
 }

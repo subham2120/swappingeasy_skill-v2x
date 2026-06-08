@@ -8,7 +8,11 @@ public class ExchangeRequest {
     private Long requestedSkillId;
     private Long offeredSkillId;
 
-    // ===== GETTERS & SETTERS =====
+    private Long requestedProductId;
+    private Long offeredProductId;
+
+
+// ===== GETTERS & SETTERS =====
 
     public Long getRequesterId() {
         return requesterId;
@@ -41,4 +45,22 @@ public class ExchangeRequest {
     public void setOfferedSkillId(Long offeredSkillId) {
         this.offeredSkillId = offeredSkillId;
     }
+
+    public Long getRequestedProductId() {
+        return requestedProductId;
+    }
+
+    public void setRequestedProductId(Long requestedProductId) {
+        this.requestedProductId = requestedProductId;
+    }
+
+    public Long getOfferedProductId() {
+        return offeredProductId;
+    }
+
+    public void setOfferedProductId(Long offeredProductId) {
+        this.offeredProductId = offeredProductId;
+    }
+
+
 }

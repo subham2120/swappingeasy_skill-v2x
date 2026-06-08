@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+import "../styles/Messages.css";
 
 function Messages() {
   const senderId = Number(localStorage.getItem("userId"));
   const username = localStorage.getItem("username");
 
   const [searchParams] = useSearchParams();
-
   const receiverIdFromUrl = searchParams.get("userId");
   const receiverNameFromUrl = searchParams.get("name");
 
@@ -24,7 +26,7 @@ function Messages() {
     api
       .get(`/messages/my-conversations/${senderId}`)
       .then(res => setConversations(res.data))
-      .catch(err => console.error("Conversation load error", err));
+      .catch(err => console.error(err));
   }, [senderId]);
 
   /* ================= LOAD MESSAGES ================= */
@@ -33,11 +35,54 @@ function Messages() {
       const res = await api.get(`/messages/conversation/${cid}`);
       setMessages(res.data);
     } catch (err) {
-      console.error("Message load error", err);
+      console.error(err);
     }
   };
 
-  /* ================= AUTO OPEN CHAT (FROM EXCHANGE) ================= */
+  useEffect(() => {
+
+    if (!conversationId) return;
+
+    const socket = new SockJS("http://localhost:8080/ws");
+
+    const client = new Client({
+      webSocketFactory: () => socket,
+
+      onConnect: () => {
+
+        client.subscribe(
+          `/topic/chat/${conversationId}`,
+          (message) => {
+
+            const newMessage =
+              JSON.parse(message.body);
+
+            setMessages(prev => {
+
+              const exists = prev.some(
+                m => m.id === newMessage.id
+              );
+
+              return exists
+                ? prev
+                : [...prev, newMessage];
+            });
+
+          }
+        );
+
+      }
+    });
+
+    client.activate();
+
+    return () => {
+      client.deactivate();
+    };
+
+  }, [conversationId]);
+
+  /* ================= AUTO OPEN CHAT ================= */
   useEffect(() => {
     if (!senderId || !receiverIdFromUrl) return;
 
@@ -47,174 +92,154 @@ function Messages() {
         name: receiverNameFromUrl || "User"
       });
 
-      try {
-        const res = await api.post("/messages/init", {
-          senderId,
-          receiverId: Number(receiverIdFromUrl)
-        });
+      const res = await api.post("/messages/init", {
+        senderId,
+        receiverId: Number(receiverIdFromUrl)
+      });
 
-        const cid = res.data.conversationId;
-        setConversationId(cid);
-        loadMessages(cid);
-      } catch (err) {
-        console.error("Auto open chat error", err);
-      }
+      setConversationId(res.data.conversationId);
+      loadMessages(res.data.conversationId);
     };
 
     openFromExchange();
   }, [senderId, receiverIdFromUrl]);
 
-  /* ================= OPEN CHAT FROM LEFT PANEL ================= */
+  /* ================= OPEN CHAT ================= */
   const openChat = async convo => {
     setActiveChat({
       userId: convo.otherUserId,
       name: convo.otherUserName
     });
 
-    try {
-      const res = await api.post("/messages/init", {
-        senderId,
-        receiverId: convo.otherUserId
-      });
+    const res = await api.post("/messages/init", {
+      senderId,
+      receiverId: convo.otherUserId
+    });
 
-      const cid = res.data.conversationId;
-      setConversationId(cid);
-      loadMessages(cid);
-    } catch (err) {
-      console.error("Init chat error", err);
-    }
+    setConversationId(res.data.conversationId);
+    loadMessages(res.data.conversationId);
   };
 
   /* ================= SEND MESSAGE ================= */
   const sendMessage = async () => {
-    if (!input.trim() || !conversationId || !activeChat) return;
+    if (!input.trim() || !conversationId) return;
 
-    try {
-      await api.post("/messages/send", {
-        senderId,
-        receiverId: activeChat.userId,
-        content: input
-      });
+    await api.post("/messages/send", {
+      senderId,
+      receiverId: activeChat.userId,
+      content: input
+    });
 
-      setInput("");
-      loadMessages(conversationId);
-    } catch (err) {
-      console.error("Send message error", err);
-    }
+    setInput("");
+    loadMessages(conversationId);
   };
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 60px)" }}>
-      {/* ================= LEFT PANEL ================= */}
-      <div style={{ width: 300, borderRight: "1px solid #ddd", padding: 16 }}>
-        <h3>{username}</h3>
+    /* 🔥 MAIN WRAPPER (SIDEBAR + NAVBAR FIX) */
+    <div className="messages-container">
+        <div className="conversation-sidebar">
+        <h3 className="chat-username">{username}</h3>
 
         {conversations.length === 0 && (
-          <p style={{ color: "#777" }}>No conversations</p>
+          <p className="no-conversations">No conversations</p>
         )}
 
         {conversations.map(c => (
-          <div
-            key={c.conversationId}
-            onClick={() => openChat(c)}
-            style={{
-              padding: 10,
-              cursor: "pointer",
-              borderBottom: "1px solid #eee"
-            }}
-          >
+        <div
+          key={c.conversationId}
+          onClick={() => openChat(c)}
+          className={`conversation-item ${
+            activeChat?.userId === c.otherUserId
+              ? "active-conversation"
+              : ""
+          }`}
+        >
+
+          <div className="conversation-avatar">
+            {c.otherUserName.charAt(0).toUpperCase()}
+          </div>
+
+          <div className="conversation-info">
+
             <b>{c.otherUserName}</b>
-            <div style={{ fontSize: 12, color: "#666" }}>
+
+            <div className="last-message">
               {c.lastMessage}
             </div>
+
           </div>
+
+        </div>
         ))}
       </div>
 
-      {/* ================= RIGHT PANEL ================= */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      {/* ================= CHAT AREA ================= */}
+      <div className="chat-section">
         {!activeChat ? (
-          <div style={{ margin: "auto", color: "#777" }}>
+          <div className="empty-chat">
             Select a chat to start messaging
           </div>
         ) : (
           <>
             {/* HEADER */}
-            <div style={{ padding: 16, borderBottom: "1px solid #ddd" }}>
-              <b>{activeChat.name}</b>
-            </div>
+          {/* HEADER */}
+          <div className="chat-header">
+
+             <div className="chat-user">
+
+                <div className="chat-avatar">
+                   {activeChat.name.charAt(0)}
+                </div>
+
+                <div>
+                   <b>{activeChat.name}</b>
+
+                   <div className="online-status">
+                      Online
+                   </div>
+
+                </div>
+
+             </div>
+
+          </div>
 
             {/* MESSAGES */}
-            <div
-              style={{
-                flex: 1,
-                padding: 20,
-                overflowY: "auto",
-                background: "#fafafa"
-              }}
-            >
+           <div className="messages-area">
               {messages.map(m => (
                 <div
                   key={m.id}
-                  style={{
-                    marginBottom: 10,
-                    textAlign:
-                      m.senderId === senderId ? "right" : "left"
-                  }}
+                  className={`message-row ${
+                    m.senderId === senderId
+                      ? "sent"
+                      : "received"
+                  }`}
                 >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      padding: "8px 12px",
-                      borderRadius: 18,
-                      background:
-                        m.senderId === senderId
-                          ? "#3897f0"
-                          : "#e4e6eb",
-                      color:
-                        m.senderId === senderId
-                          ? "white"
-                          : "black"
-                    }}
-                  >
+               <div
+                 className={`message-bubble ${
+                   m.senderId === senderId
+                     ? "sent"
+                     : "received"
+                 }`}
+               >
                     {m.content}
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* INPUT */}
-            <div
-              style={{
-                display: "flex",
-                padding: 10,
-                borderTop: "1px solid #ddd"
-              }}
-            >
-              <input
+          <div className="chat-input-area">
+              <input className="chat-input"
                 value={input}
-                onChange={e => setInput(e.target.value)}
-                placeholder="Type a message..."
-                style={{
-                  flex: 1,
-                  padding: 10,
-                  borderRadius: 20,
-                  border: "1px solid #ccc"
-                }}
-                onKeyDown={e => e.key === "Enter" && sendMessage()}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder="Type a message..."
+                  onKeyDown={e => e.key === "Enter" && sendMessage()}
               />
-              <button
-                onClick={sendMessage}
-                style={{
-                  marginLeft: 10,
-                  padding: "8px 16px",
-                  borderRadius: 20,
-                  border: "none",
-                  background: "#3897f0",
-                  color: "white",
-                  cursor: "pointer"
-                }}
-              >
+             <button
+               className="send-btn"
+               onClick={sendMessage}
+             >
                 Send
               </button>
             </div>

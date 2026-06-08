@@ -59,25 +59,19 @@ public class UserController {
         if (file.isEmpty()) {
             throw new RuntimeException("File is empty");
         }
-
         String baseDir = System.getProperty("user.dir");
-
         String uploadDir = baseDir + File.separator + "uploads"
                 + File.separator + "profile";
-
         File dir = new File(uploadDir);
-
         // 🔥 directory create
         if (!dir.exists()) {
             dir.mkdirs();
         }
-
         String fileName =
                 "user_" + userId + "_" + System.currentTimeMillis() + "_" +
                         file.getOriginalFilename();
 
         File dest = new File(dir, fileName);
-
         try {
             file.transferTo(dest);
         } catch (IOException e) {
@@ -86,17 +80,9 @@ public class UserController {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         user.setProfileImage("/images/profile/" + fileName);
         userRepository.save(user);
-
         return ResponseEntity.ok(user.getProfileImage());
     }
-
-
-
-
-
-
 
 }

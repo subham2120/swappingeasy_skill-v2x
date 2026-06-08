@@ -17,22 +17,23 @@ a {
 }
 
 /* ===== SKILL GRID ===== */
-.skill-grid {
-  display: grid;
-  gap: 20px;
-  padding: 20px;
+
+.skill-grid{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    padding:0;
 }
 
-/* Mobile → 1 card */
-@media (max-width: 767px) {
-  .skill-grid {
-    grid-template-columns: 1fr;
-  }
+*{
+  box-sizing:border-box;
 }
 
-/* Laptop / Desktop → 3 cards */
-@media (min-width: 768px) {
-  .skill-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+html,
+body{
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
 }
+
+

@@ -15,6 +15,25 @@ public class Exchange {
     private Long requestedSkillId;  // jo chahiye
     private Long offeredSkillId;    // jo de raha hai
 
+    public Long getRequestedProductId() {
+        return requestedProductId;
+    }
+
+    public void setRequestedProductId(Long requestedProductId) {
+        this.requestedProductId = requestedProductId;
+    }
+
+    public Long getOfferedProductId() {
+        return offeredProductId;
+    }
+
+    public void setOfferedProductId(Long offeredProductId) {
+        this.offeredProductId = offeredProductId;
+    }
+
+    private Long requestedProductId;
+    private Long offeredProductId;
+
     public ExchangeStatus getStatus() {
         return status;
     }
@@ -64,6 +83,7 @@ public class Exchange {
     public void setOfferedSkillId(Long offeredSkillId) {
         this.offeredSkillId = offeredSkillId;
     }
+
 
 
 }

@@ -5,9 +5,12 @@ import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
 import MyExchanges from "./pages/MyExchanges";
 import AddSkill from "./pages/AddSkill";
+import AddProduct from "./pages/AddProduct";
 import Profile from "./pages/Profile";
 import RightSidebar from "./components/RightSidebar";
 import Messages from "./pages/Messages";
+import DashboardV2 from "./pages/DashboardV2";
+import Notifications from "./pages/Notifications";
 
 function App() {
   const userId = localStorage.getItem("userId"); // ✅ ADD THIS
@@ -34,6 +37,9 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/dashboard" element={<DashboardV2 />} />
+            <Route path="/notifications"element={<Notifications />} />
           </Routes>
         </div>
 
