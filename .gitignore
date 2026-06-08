@@ -10,8 +10,6 @@ frontend/.env
 backend/target/
 backend/.env
 
-# Uploads (images, user files)
-uploads/
 
 # OS
 .DS_Store
