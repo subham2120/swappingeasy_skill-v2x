@@ -1,0 +1,47 @@
+.suggestion-panel{
+    background:#EBEBF7;
+    border-radius:20px;
+    padding:18px;
+    margin-bottom:20px;
+}
+
+.suggestion-panel h4{
+    margin-bottom:15px;
+    border-bottom:1px solid #eee;
+    padding-bottom:10px;
+}
+
+.suggestion-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.suggestion-item:hover{
+    background:#f5f9ff;
+}
+
+.suggestion-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#E6E6FA;
+    border:solid 1px MediumOrchid;
+    color:black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.suggestion-info{
+    flex:1;
+}
+.suggestion-info small{
+   color:#888;
+   font-size:12px;
+}

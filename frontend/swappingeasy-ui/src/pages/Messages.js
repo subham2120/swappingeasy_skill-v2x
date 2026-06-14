@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate  } from "react-router-dom";
 import api from "../services/api";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
@@ -9,7 +9,19 @@ function Messages() {
   const senderId = Number(localStorage.getItem("userId"));
   const username = localStorage.getItem("username");
 
+  const navigate = useNavigate();
+
   const [searchParams] = useSearchParams();
+  useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first");
+      navigate("/login");
+    }
+
+  }, [navigate]);
   const receiverIdFromUrl = searchParams.get("userId");
   const receiverNameFromUrl = searchParams.get("name");
 
@@ -18,6 +30,7 @@ function Messages() {
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [input, setInput] = useState("");
+
 
   /* ================= LOAD CONVERSATIONS ================= */
   useEffect(() => {
@@ -206,27 +219,43 @@ function Messages() {
 
             {/* MESSAGES */}
            <div className="messages-area">
-              {messages.map(m => (
-                <div
-                  key={m.id}
-                  className={`message-row ${
-                    m.senderId === senderId
-                      ? "sent"
-                      : "received"
-                  }`}
-                >
+             {messages.map(m => (
                <div
-                 className={`message-bubble ${
+                 key={m.id}
+                 className={`message-row ${
                    m.senderId === senderId
                      ? "sent"
                      : "received"
                  }`}
                >
-                    {m.content}
-                  </div>
-                </div>
-              ))}
-            </div>
+                 <div
+                   className={`message-wrapper ${
+                     m.senderId === senderId
+                       ? "sent"
+                       : "received"
+                   }`}
+                 >
+                   <div
+                     className={`message-bubble ${
+                       m.senderId === senderId
+                         ? "sent"
+                         : "received"
+                     }`}
+                   >
+                     {m.content}
+                   </div>
+
+                   <div className="message-time">
+                     {m.createdAt &&
+                       new Date(m.createdAt).toLocaleTimeString([], {
+                         hour: "2-digit",
+                         minute: "2-digit"
+                       })}
+                   </div>
+                 </div>
+               </div>
+             ))}
+           </div>
 
             {/* INPUT */}
           <div className="chat-input-area">

@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
-import exchangeImg from "../assets/exchange.png";
+import "../styles/Register.css";
+
+import {
+  FaHandshake,
+  FaUsers,
+  FaChartLine,
+  FaShieldAlt,
+  FaBolt
+} from "react-icons/fa";
 
 function Register() {
   const [form, setForm] = useState({
@@ -22,143 +30,146 @@ function Register() {
   };
 
   return (
-    <div style={pageStyle}>
+    <div className="register-page">
 
-      {/* TOP HEADING */}
-      <div style={headerStyle}>
-        <h1>Swapingeasy</h1>
-        <p>Exchange Skills. Share Talent. Grow Together.</p>
-      </div>
+      <div className="register-content">
 
-      {/* MAIN CONTENT */}
-      <div style={contentStyle}>
+        {/* LEFT SIDE */}
+        <div className="register-left">
 
-        {/* LEFT IMAGE */}
-        <div style={leftStyle}>
-          <img
-            src={exchangeImg}
-            alt="Skill Exchange"
-            style={{
-              width: "100%",
-              maxWidth: "420px"
-            }}
-          />
+          <div className="feature-list">
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaHandshake />
+              </div>
+
+              <span>
+                Exchange <b>Skills.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaUsers />
+              </div>
+
+              <span>
+                Share <b>Talent.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaChartLine />
+              </div>
+
+              <span>
+                Grow <b>Together.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaShieldAlt />
+              </div>
+
+              <span>
+                Real <b>Connections.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaBolt />
+              </div>
+
+              <span>
+                Instant <b>Messaging.</b>
+              </span>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* RIGHT REGISTER CARD */}
-        <div style={rightStyle}>
-          <div style={cardStyle}>
-            <h2 style={{ textAlign: "center", marginBottom: "25px" }}>
+        {/* RIGHT SIDE */}
+        <div className="register-right">
+
+          <div className="register-card">
+
+            <h2 className="register-title">
               Create Account ✨
             </h2>
+
+            <p className="register-subtitle">
+              Join SwappingEasy Community
+            </p>
 
             <input
               type="text"
               placeholder="Full Name"
               value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
-              style={inputStyle}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  name: e.target.value
+                })
+              }
+              className="register-input"
             />
 
             <input
               type="email"
               placeholder="Email"
               value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              style={inputStyle}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value
+                })
+              }
+              className="register-input"
             />
 
             <input
               type="password"
               placeholder="Password"
               value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              style={inputStyle}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  password: e.target.value
+                })
+              }
+              className="register-input"
             />
 
-            <button onClick={submit} style={buttonStyle}>
+            <button
+              onClick={submit}
+              className="register-btn"
+            >
               Register
             </button>
 
-            <p style={{ textAlign: "center", marginTop: "18px" }}>
+            <p className="login-text">
               Already have an account?{" "}
-              <Link to="/login" style={{ color: "#3897f0", fontWeight: "bold" }}>
+              <Link
+                to="/login"
+                className="login-link"
+              >
                 Login
               </Link>
             </p>
+
           </div>
+
         </div>
 
       </div>
+
     </div>
   );
 }
-
-/* ================= STYLES ================= */
-
-const pageStyle = {
-  minHeight: "100vh",
-  backgroundColor: "#3897f0",
-  padding: "40px 60px"
-};
-
-const headerStyle = {
-  textAlign: "center",
-  color: "white",
-  marginBottom: "40px"
-};
-
-const contentStyle = {
-  maxWidth: "1200px",
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  alignItems: "center",
-  gap: "40px"
-};
-
-const leftStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-};
-
-const rightStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-};
-
-const cardStyle = {
-  width: "100%",
-  maxWidth: "360px",
-  padding: "35px",
-  borderRadius: "18px",
-  background: "rgba(255, 255, 255, 0.9)",
-  backdropFilter: "blur(12px)",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.25)"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "10px",
-  border: "1px solid #ddd",
-  fontSize: "14px",
-  outline: "none"
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "12px",
-  backgroundColor: "#3897f0",
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontSize: "15px",
-  fontWeight: "bold"
-};
 
 export default Register;

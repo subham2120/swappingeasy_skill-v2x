@@ -4,7 +4,7 @@ position: fixed;
 left: 0;
 top: 60px;
 height: calc(100vh - 60px);
-background: white;
+background: 	#d6cadd;
 border-right: 1px solid #ddd;
 padding: 16px;
 overflow-y: auto;
@@ -32,9 +32,9 @@ font-weight: 700;
 }
 
 .sidebar-icon {
-  font-size: 18px;
-  color: #0d6efd;
-  min-width: 20px;
+  font-size: 16px;
+  color: black;
+  min-width: 10px;
 }
 
 .user-panel {
@@ -47,7 +47,7 @@ font-weight: 700;
   height: 50px;
   margin: 0 auto 6px;
   border-radius: 50%;
-  background: #0d6efd;
+  background:#C9A0DC;
   color: white;
   display: flex;
   align-items: center;

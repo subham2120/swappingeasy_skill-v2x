@@ -11,18 +11,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final ConversationService conversationService;
     public Notification create(
                 Long userId,
                 String message,
                 String type) {
 
-            Notification n = new Notification();
+            Notification notification = new Notification();
 
-            n.setUserId(userId);
-            n.setMessage(message);
-            n.setType(type);
+            notification.setUserId(userId);
+            notification.setMessage(message);
+            notification.setType(type);
 
-            return notificationRepository.save(n);
+            return notificationRepository.save(notification);
         }
 
     public List<Notification> getUserNotifications(Long userId) {

@@ -9,6 +9,8 @@ import com.swapingeasy.repository.ConversationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,6 +70,7 @@ public class MessageService {
         message.setSenderId(senderId);
         message.setReceiverId(receiverId);
         message.setContent(request.getContent());
+        message.setCreatedAt(LocalDateTime.now());
 
         Message savedMessage =
                 messageRepository.save(message);

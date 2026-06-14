@@ -3,10 +3,13 @@ import React, { useState } from "react";
 function EditProfileModal({ profile, onClose, onSave }) {
   const [bio, setBio] = useState(profile.bio || "");
   const [experience, setExperience] = useState(profile.experience || "");
+  const [username, setUsername] =
+    useState(profile.username || "");
 
   const handleSave = () => {
     // 🔥 backend baad me
     onSave({
+      username,
       bio,
       experience
     });
@@ -17,11 +20,15 @@ function EditProfileModal({ profile, onClose, onSave }) {
       <div style={modal}>
         <h2 style={{ marginBottom: "20px" }}>Edit Profile</h2>
 
-        {/* Username (readonly) */}
-        <div style={field}>
-          <label>Username</label>
-          <input value={profile.username} disabled style={inputDisabled} />
-        </div>
+        <input
+          value={username}
+          onChange={(e) =>
+             setUsername(e.target.value)
+          }
+          style={input}
+        />
+
+
 
         {/* Bio */}
         <div style={field}>

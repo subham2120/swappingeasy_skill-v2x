@@ -34,7 +34,15 @@ function SkillCard({
     return res.data;
   };
 
+
   const requestExchange = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first");
+    navigate("/login");
+    return;
+  }
     if (!userId) {
       alert("Please login first");
       return;
@@ -98,6 +106,7 @@ function SkillCard({
       setShowSelect(false);
       setMyItems([]);
       setSelectedItem("");
+
     }
   }, [userId]);
 
@@ -105,21 +114,78 @@ function SkillCard({
     <div className={`skill-card ${grid ? "grid-card" : ""}`}>
       {/* USER HEADER */}
       {!hideUser && (
-        <div
-          onClick={goToProfile}
-          className="skill-header"
-        >
-          <div className="skill-avatar">
-            {skill.username
-              ? skill.username.charAt(0).toUpperCase()
-              : "U"}
+        <div className="skill-header">
+
+          <div
+            className="user-info"
+            onClick={goToProfile}
+          >
+            <div className="skill-avatar">
+              {skill.profileImage ? (
+                <img
+                  src={`http://localhost:8080${skill.profileImage}`}
+                  alt="profile"
+                  className="skill-avatar-img"
+                />
+              ) : (
+                skill.username
+                  ? skill.username.charAt(0).toUpperCase()
+                  : "U"
+              )}
+            </div>
+
+            <b className="skill-username">
+              {skill.username || "Unknown User"}
+            </b>
           </div>
 
-          <b className="skill-username">
-            {skill.username || "Unknown User"}
-          </b>
+          <button
+            onClick={requestExchange}
+            disabled={loading || showSelect}
+            className="exchange-btn-small"
+          >
+            Exchange
+          </button>
+
         </div>
       )}
+
+       {showSelect && (
+                <div className="exchange-container">
+
+                  <select
+                    value={selectedItem}
+                    onChange={(e) =>
+                      setSelectedItem(e.target.value)
+                    }
+                    className="exchange-select"
+                  >
+                    <option value="">
+                      Select your skill to offer
+                    </option>
+
+                    {myItems.map((item) => (
+                      <option
+                        key={item.id}
+                        value={item.id}
+                      >
+                        {item.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  {selectedItem && (
+                    <button
+                      onClick={submitExchange}
+                      className="confirm-btn"
+                    >
+                      Confirm
+                    </button>
+                  )}
+
+                </div>
+
+              )}
 
       {/* IMAGE */}
       {skill.imageUrl && (
@@ -146,48 +212,8 @@ function SkillCard({
           {skill.description}
         </p>
 
-        {/* REQUEST BUTTON */}
-        <button
-          onClick={requestExchange}
-          disabled={loading || showSelect}
-          className="exchange-btn"
-        >
-          🔁 Request Exchange
-        </button>
-
         {/* SELECT ITEM */}
-        {showSelect && (
-          <div className="exchange-container">
-            <select
-              value={selectedItem}
-              onChange={(e) =>
-                setSelectedItem(e.target.value)
-              }
-              className="exchange-select"
-            >
-              <option value="">
-                Select your{" "}
-                {isSkill ? "skill" : "product"} to offer
-              </option>
 
-              {myItems.map((item) => (
-                <option
-                  key={item.id}
-                  value={item.id}
-                >
-                  {item.title}
-                </option>
-              ))}
-            </select>
-
-            <button
-              onClick={submitExchange}
-              className="confirm-btn"
-            >
-              ✅ Confirm Exchange
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

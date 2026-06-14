@@ -1,0 +1,140 @@
+
+.register-page{
+  min-height:100vh;
+  background:linear-gradient(135deg,#faf7fd,#f4eef8,#efe7f7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:30px;
+}
+
+.register-content{
+min-height:100vh;
+  width:100%;
+  max-width:1200px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:80px;
+}
+
+.register-left{
+  flex:1;
+}
+
+.feature-list{
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+.feature-item{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding-bottom:18px;
+  border-bottom:1px solid #e8dff0;
+}
+
+.feature-icon{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  background:#f2e6fa;
+  color:#b96ad9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+
+.feature-item span{
+  font-size:28px;
+  font-weight:700;
+  color:#222;
+}
+
+.feature-item b{
+  color:#c06ddc;
+}
+
+.register-right{
+  flex:.9;
+  display:flex;
+  justify-content:center;
+}
+
+.register-card{
+  width:400px;
+  background:#fff;
+  padding:35px;
+  border-radius:18px;
+  box-shadow:0 10px 35px rgba(0,0,0,.08);
+}
+
+
+.register-title{
+  text-align:center;
+  font-size:34px;
+  color:#222;
+  margin-bottom:10px;
+}
+
+.register-subtitle{
+  text-align:center;
+  color:#777;
+  margin-bottom:25px;
+}
+
+.register-input{
+  width:100%;
+  height:52px;
+  border:1px solid #e2e2e2;
+  border-radius:10px;
+  padding:0 16px;
+  margin-bottom:15px;
+  outline:none;
+}
+
+.register-input:focus{
+  border-color:#c06ddc;
+}
+
+.register-btn{
+  width:100%;
+  height:52px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(90deg,#b965d6,#d084ea);
+  color:white;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.login-text{
+  text-align:center;
+  margin-top:20px;
+}
+
+.login-link{
+  color:#b965d6;
+  text-decoration:none;
+  font-weight:600;
+}
+
+@media(max-width:992px){
+
+  .register-content{
+    flex-direction:column;
+  }
+
+  .feature-item span{
+    font-size:26px;
+  }
+
+  .register-card{
+    width:100%;
+    max-width:430px;
+  }
+}

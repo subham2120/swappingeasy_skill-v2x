@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import "../styles/AddSkill.css";
 
 function AddSkill() {
+
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
@@ -12,8 +14,19 @@ function AddSkill() {
   });
 
   const [image, setImage] = useState(null);
+  useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first");
+      navigate("/login");
+    }
+
+  }, [navigate]);
 
   const submitSkill = () => {
+
     if (!userId) {
       alert("Please login first");
       return;
@@ -25,6 +38,7 @@ function AddSkill() {
     }
 
     const formData = new FormData();
+
     formData.append("title", skill.title);
     formData.append("description", skill.description);
     formData.append("userId", userId);
@@ -43,73 +57,63 @@ function AddSkill() {
   };
 
   return (
-    <div style={container}>
-      <h2>Add New Skill</h2>
+    <div className="add-skill-container">
 
-      <input
-        placeholder="Skill title (e.g. Java, Guitar, Cooking)"
-        value={skill.title}
-        onChange={e => setSkill({ ...skill, title: e.target.value })}
-        style={input}
-      />
+      <div className="add-skill-card">
 
-      <textarea
-        placeholder="Describe your skill"
-        value={skill.description}
-        onChange={e => setSkill({ ...skill, description: e.target.value })}
-        style={textarea}
-      />
+        <h2>Add New Skill</h2>
 
-      {/* IMAGE UPLOAD */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={e => setImage(e.target.files[0])}
-        style={{ marginBottom: "15px" }}
-      />
+        <input
+          className="skill-input"
+          placeholder="Skill title (e.g. Java, Guitar, Cooking)"
+          value={skill.title}
+          onChange={e =>
+            setSkill({
+              ...skill,
+              title: e.target.value
+            })
+          }
+        />
 
-      <button onClick={submitSkill} style={button}>
-        Add Skill
-      </button>
+        <textarea
+          className="skill-textarea"
+          placeholder="Describe your skill"
+          value={skill.description}
+          onChange={e =>
+            setSkill({
+              ...skill,
+              description: e.target.value
+            })
+          }
+        />
+
+        <input
+          className="skill-file"
+          type="file"
+          accept="image/*"
+          onChange={e => setImage(e.target.files[0])}
+        />
+
+      {image && (
+         <img
+            src={URL.createObjectURL(image)}
+            alt="preview"
+            className="image-preview"
+         />
+      )}
+
+
+        <button
+          className="add-skill-btn"
+          onClick={submitSkill}
+        >
+          Add Skill
+        </button>
+
+      </div>
+
     </div>
   );
 }
-
-/* STYLES */
-const container = {
-  maxWidth: "400px",
-  margin: "60px auto",
-  padding: "30px",
-  background: "#fff",
-  borderRadius: "12px",
-  boxShadow: "0 6px 16px rgba(0,0,0,0.15)"
-};
-
-const input = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "8px",
-  border: "1px solid #ccc"
-};
-
-const textarea = {
-  width: "100%",
-  height: "100px",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "8px",
-  border: "1px solid #ccc"
-};
-
-const button = {
-  width: "100%",
-  padding: "12px",
-  backgroundColor: "#3897f0",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
-};
 
 export default AddSkill;

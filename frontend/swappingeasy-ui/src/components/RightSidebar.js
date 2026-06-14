@@ -18,12 +18,29 @@ const navigate = useNavigate();
 const userId = localStorage.getItem("userId");
 const username = localStorage.getItem("username");
 
-if (!userId) return null;
+
 
 const logout = () => {
-localStorage.removeItem("userId");
-localStorage.removeItem("username");
-navigate("/login");
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("username");
+
+  navigate("/");
+  window.location.reload();
+};
+
+const protectedNavigate = (path) => {
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first");
+    navigate("/login");
+    return;
+  }
+
+  navigate(path);
 };
 
 const Item = ({ icon, label, path, onClick }) => (
@@ -55,20 +72,43 @@ return ( <div className="sidebar">
 
  <Item icon={<FaHome />} label="Home" path="/" />
  <Item icon={<FaUser />} label="Profile" path="/profile" />
- <Item icon={<FaComments />} label="Messages" path="/messages" />
+
+<Item
+  icon={<FaComments />}
+  label="Messages"
+  onClick={() => protectedNavigate("/messages")}
+/>
 
 
 
- <Item icon={<FaPlusCircle />} label="Add Skill" path="/add-skill" />
- <Item icon={<FaBox />} label="Add Product" path="/add-product" />
- <Item icon={<FaExchangeAlt />} label="My Exchanges" path="/my-exchanges" />
+<Item
+  icon={<FaPlusCircle />}
+  label="Add Skill"
+  onClick={() => protectedNavigate("/add-skill")}
+/>
 
+<Item
+  icon={<FaBox />}
+  label="Add Product"
+  onClick={() => protectedNavigate("/add-product")}
+/>
 
+<Item
+  icon={<FaExchangeAlt />}
+  label="My Exchanges"
+  onClick={() => protectedNavigate("/my-exchanges")}
+/>
 
 <Item icon={<FaChartBar />} label="Dashboard" path="/dashboard" />
 <Item icon={<FaBell />} label="Notifications" path="/notifications" />
 
-<Item icon={<FaSignOutAlt />} label="Logout" onClick={logout} />
+{userId && (
+  <Item
+    icon={<FaSignOutAlt />}
+    label="Logout"
+    onClick={logout}
+  />
+)}
 
 </div>
 

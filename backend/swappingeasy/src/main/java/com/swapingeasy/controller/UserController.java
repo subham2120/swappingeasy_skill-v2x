@@ -48,6 +48,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(
+                userRepository.findAll()
+        );
+    }
+
     @PostMapping(
             value = "/{userId}/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE

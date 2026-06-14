@@ -47,6 +47,13 @@
     margin-top:40px;
 }
 
+.notification-time{
+    font-size:12px;
+    color:#888;
+    margin-top:8px;
+    text-align:right;
+}
+
 /* Mobile */
 
 @media(max-width:768px){

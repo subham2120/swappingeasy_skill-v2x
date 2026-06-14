@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
-import exchangeImg from "../assets/exchange.png";
+import "../styles/Login.css";
+
+import {
+  FaHandshake,
+  FaUsers,
+  FaChartLine,
+  FaShieldAlt,
+  FaBolt
+} from "react-icons/fa";
 
 function Login() {
   const [form, setForm] = useState({
@@ -12,145 +20,169 @@ function Login() {
   const navigate = useNavigate();
 
   const submit = () => {
-    api.post("/auth/login", form)
-      .then(res => {
-        localStorage.setItem("userId", res.data.userId || res.data.id);
-        localStorage.setItem("username", res.data.name);
+    api
+      .post("/auth/login", form)
+      .then((res) => {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem(
+          "userId",
+          res.data.userId || res.data.id
+        );
+        localStorage.setItem(
+          "username",
+          res.data.name
+        );
+
         navigate("/");
       })
-      .catch(() => alert("Invalid email or password"));
+      .catch(() =>
+        alert("Invalid email or password")
+      );
   };
 
   return (
-    <div style={pageStyle}>
+    <div className="login-page">
 
-      {/* TOP HEADING */}
-      <div style={headerStyle}>
-        <h1>Swapingeasy</h1>
-        <p>Exchange Skills. Share Talent. Grow Together.</p>
-      </div>
+      <div className="login-content">
 
-      {/* MAIN CONTENT */}
-      <div style={contentStyle}>
+        {/* LEFT SIDE */}
+        <div className="login-left">
 
-        {/* LEFT IMAGE */}
-        <div style={leftStyle}>
-          <img
-            src={exchangeImg}
-            alt="Skill Exchange"
-            style={{
-              width: "100%",
-              maxWidth: "420px"
-            }}
-          />
+
+
+          <div className="feature-list">
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaHandshake />
+              </div>
+
+              <span>
+                Exchange <b>Skills.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaUsers />
+              </div>
+
+              <span>
+                Share <b>Talent.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaChartLine />
+              </div>
+
+              <span>
+                Grow <b>Together.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaShieldAlt />
+              </div>
+
+              <span>
+                Real <b>Connections.</b>
+              </span>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <FaBolt />
+              </div>
+
+              <span>
+                Instant <b>Messaging.</b>
+              </span>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* RIGHT LOGIN CARD */}
-        <div style={rightStyle}>
-          <div style={cardStyle}>
-            <h2 style={{ textAlign: "center", marginBottom: "25px" }}>
+        {/* RIGHT SIDE */}
+        <div className="login-right">
+
+          <div className="login-card">
+
+            <h1 className="login-title">
               Welcome Back 👋
-            </h2>
+            </h1>
+
+            <p className="login-subtitle">
+              Login to continue to SwappingEasy
+            </p>
 
             <input
               type="email"
               placeholder="Email"
               value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              style={inputStyle}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value
+                })
+              }
+              className="login-input"
             />
 
             <input
               type="password"
               placeholder="Password"
               value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              style={inputStyle}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  password: e.target.value
+                })
+              }
+              className="login-input"
             />
 
-            <button onClick={submit} style={buttonStyle}>
+            <button
+              onClick={submit}
+              className="login-btn"
+            >
               Login
             </button>
 
-            <p style={{ textAlign: "center", marginTop: "18px" }}>
+            <div className="divider">
+              <span>OR</span>
+            </div>
+
+            <button className="google-btn">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                alt="google"
+                width="18"
+              />
+              Continue with Google
+            </button>
+
+            <p className="register-text">
               New user?{" "}
-              <Link to="/register" style={{ color: "#3897f0", fontWeight: "bold" }}>
+              <Link
+                to="/register"
+                className="register-link"
+              >
                 Register
               </Link>
             </p>
+
           </div>
+
         </div>
 
       </div>
+
     </div>
   );
 }
-
-/* ================= STYLES ================= */
-
-const pageStyle = {
-  minHeight: "100vh",
-  backgroundColor: "#3897f0",
-  padding: "40px 60px"
-};
-
-const headerStyle = {
-  textAlign: "center",
-  color: "white",
-  marginBottom: "40px"
-};
-
-const contentStyle = {
-  maxWidth: "1200px",
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  alignItems: "center",
-  gap: "40px"
-};
-
-const leftStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-};
-
-const rightStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-};
-
-const cardStyle = {
-  width: "100%",
-  maxWidth: "360px",
-  padding: "35px",
-  borderRadius: "18px",
-  background: "rgba(255, 255, 255, 0.9)",
-  backdropFilter: "blur(12px)",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.25)"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "10px",
-  border: "1px solid #ddd",
-  fontSize: "14px",
-  outline: "none"
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "12px",
-  backgroundColor: "#3897f0",
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontSize: "15px",
-  fontWeight: "bold"
-};
 
 export default Login;

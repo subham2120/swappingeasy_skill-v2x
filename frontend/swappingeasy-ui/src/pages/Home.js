@@ -3,11 +3,13 @@ import api from "../services/api";
 import SkillCard from "../components/SkillCard";
 import "../styles/Home.css";
 import NotificationPanel from "../components/NotificationPanel";
+import SuggestionPanel from "../components/SuggestionPanel";
 
 function Home() {
 const [skills, setSkills] = useState([]);
 const [products, setProducts] = useState([]);
 const [activeTab, setActiveTab] = useState("ALL");
+
 
 useEffect(() => {
 api.get("/skills")
@@ -110,8 +112,13 @@ return (
     </div>
   )}
     </div>
-      <div className="notification-section">
-        <NotificationPanel />
+      <div className="right-panel">
+
+            <SuggestionPanel />
+
+            <NotificationPanel />
+
+
       </div>
 </div>
 

@@ -1,0 +1,193 @@
+.my-exchanges-container {
+  max-width: 1100px;
+  margin-top: 30px;
+  margin-left: 250px;
+  padding: 30px;
+}
+
+.my-exchanges-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-message {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: #3897f0;
+  color: white;
+}
+
+.tab-btn.inactive {
+  background: #eeeeee;
+  color: #333333;
+}
+
+.exchange-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.exchange-card {
+  background: #E6E6FA;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.exchange-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+
+
+.type-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 8px;
+  color: white;
+}
+
+.skill-badge {
+  background: #2980b9;
+}
+
+.product-badge {
+  background: #8e44ad;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pending {
+  background: #f59e0b;
+}
+
+.accepted {
+  background: #22c55e;
+}
+
+.rejected {
+  background: #ef4444;
+}
+
+.action-buttons {
+  margin-top: 15px;
+  padding: 5px 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.accept-btn {
+  padding: 5px 10px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+
+.accept-btn:hover {
+  background: #16a34a;
+}
+
+.reject-btn {
+  padding: 5px 10px;
+  margin-left:20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.reject-btn:hover {
+  background: #dc2626;
+}
+
+.delete-btn {
+  padding: 5px 5px;
+  margin-left:20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+.chat-btn {
+margin-left:20px;
+  padding: 5px 10px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.chat-btn:hover {
+  background: #2563eb;
+}
+@media (max-width: 992px) {
+  .exchange-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .my-exchanges-container {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .exchange-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-exchanges-container {
+    padding: 15px;
+  }
+}

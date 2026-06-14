@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +12,17 @@ function AddProduct() {
   });
 
   const [image, setImage] = useState(null);
+
+  useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first");
+      navigate("/login");
+    }
+
+  }, [navigate]);
 
   const submitProduct = () => {
     if (!userId) {

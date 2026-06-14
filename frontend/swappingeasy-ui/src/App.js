@@ -46,7 +46,10 @@ function App() {
 
 
         {/* ✅ RIGHT SIDEBAR – ONLY WHEN LOGGED IN */}
-        {userId && <RightSidebar />}
+      {window.location.pathname !== "/login" &&
+       window.location.pathname !== "/register" && (
+         <RightSidebar />
+      )}
       </div>
     </BrowserRouter>
   );

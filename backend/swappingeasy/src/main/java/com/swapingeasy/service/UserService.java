@@ -7,10 +7,10 @@ import com.swapingeasy.repository.ExchangeRepository;
 import com.swapingeasy.repository.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.swapingeasy.entity.User;
 import com.swapingeasy.repository.UserRepository;
 import org.springframework.web.multipart.MultipartFile;
+import com.swapingeasy.security.JwtUtil;
 
 import java.util.List;
 
@@ -23,16 +23,20 @@ public class UserService {
     private final ExchangeRepository exchangeRepository;
     private final ExchangeService exchangeService;
 
+    private final JwtUtil jwtUtil;
+
+
 
     public UserService(UserRepository userRepository,
                        SkillRepository skillRepository,
                        PasswordEncoder passwordEncoder,
-                       ExchangeService exchangeService, ExchangeRepository exchangeRepository, ExchangeRepository exchangeRepository1) {
+                       ExchangeService exchangeService, ExchangeRepository exchangeRepository, ExchangeRepository exchangeRepository1, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.skillRepository = skillRepository;
         this.passwordEncoder = passwordEncoder;
         this.exchangeService = exchangeService;
         this.exchangeRepository = exchangeRepository1;
+        this.jwtUtil = jwtUtil;
     }
 
     public User register(RegisterRequest request) {
@@ -52,9 +56,14 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
+        String token =
+                jwtUtil.generateToken(
+                        user.getEmail()
+                );
 
         return new LoginResponse(
                 "Login successful",
+                token,
                 user.getId(),
                 user.getName(),
                 user.getEmail()

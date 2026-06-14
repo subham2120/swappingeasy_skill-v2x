@@ -25,6 +25,7 @@ function Profile() {
 
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState("SKILLS");
 
   useEffect(() => {
     api.get(`/users/${profileUserId}/public-profile`)
@@ -80,14 +81,22 @@ function Profile() {
       />
 
       <div className="ig-header">
-        <div
-          className="ig-avatar"
-          onClick={() => isOwnProfile && setShowAvatarMenu(!showAvatarMenu)}
-        >
+       <div
+         className="ig-avatar"
+        onClick={() => {
+           setShowAvatarMenu(!showAvatarMenu);
+        }}
+       >
           {profile.profileImage ? (
-            <img src={profile.profileImage} alt="profile" className="ig-avatar-img" />
+             <img
+                src={`http://localhost:8080${profile.profileImage}`}
+                alt="profile"
+                className="ig-avatar-img"
+             />
           ) : (
-            <span>{uploading ? "..." : profile.username?.charAt(0).toUpperCase()}</span>
+             <span>
+                {profile.username?.charAt(0).toUpperCase()}
+             </span>
           )}
 
           {showAvatarMenu && isOwnProfile && (
@@ -131,14 +140,26 @@ function Profile() {
             )}
 
             {!isOwnProfile && (
-              <button
-                className="ig-btn message-btn"
-                onClick={() =>
-                  navigate(`/messages?userId=${profileUserId}&name=${profile.username}`)
-                }
-              >
-                Message
-              </button>
+             <button
+               className="ig-btn message-btn"
+               onClick={() => {
+
+                 const token = localStorage.getItem("token");
+
+                 if (!token) {
+                   alert("Please login first");
+                   navigate("/login");
+                   return;
+                 }
+
+                 navigate(
+                   `/messages?userId=${profileUserId}&name=${profile.username}`
+                 );
+
+               }}
+             >
+               Message
+             </button>
             )}
           </div>
 
@@ -156,27 +177,52 @@ function Profile() {
         </div>
       </div>
 
-      <hr />
+     <hr />
 
-      <h3>Skills</h3>
-      <div className="skills-grid">
-        {skills.map(skill => (
-          <SkillCard key={`skill-${skill.id}`} skill={skill} hideUser grid />
-        ))}
-      </div>
+     <div className="profile-tabs">
 
-      <h3 className="products-title">Products</h3>
-      <div className="skills-grid">
-        {products.map(product => (
-          <SkillCard
-            key={`product-${product.id}`}
-            skill={product}
-            type="PRODUCT"
-            hideUser
-            grid
-          />
-        ))}
-      </div>
+       <button
+         className={activeTab === "SKILLS" ? "active-tab" : ""}
+         onClick={() => setActiveTab("SKILLS")}
+       >
+         Skills ({skills.length})
+       </button>
+
+       <button
+         className={activeTab === "PRODUCTS" ? "active-tab" : ""}
+         onClick={() => setActiveTab("PRODUCTS")}
+       >
+         Products ({products.length})
+       </button>
+
+     </div>
+
+     {activeTab === "SKILLS" && (
+       <div className="skills-grid">
+         {skills.map(skill => (
+           <SkillCard
+             key={`skill-${skill.id}`}
+             skill={skill}
+             hideUser
+             grid
+           />
+         ))}
+       </div>
+     )}
+
+     {activeTab === "PRODUCTS" && (
+       <div className="skills-grid">
+         {products.map(product => (
+           <SkillCard
+             key={`product-${product.id}`}
+             skill={product}
+             type="PRODUCT"
+             hideUser
+             grid
+           />
+         ))}
+       </div>
+     )}
 
       {showEdit && (
         <div className="modal-overlay">
@@ -185,7 +231,9 @@ function Profile() {
 
             <input
               value={editUsername}
-              disabled
+              onChange={(e) =>
+                  setEditUsername(e.target.value)
+              }
               className="input-style"
             />
 
@@ -205,18 +253,32 @@ function Profile() {
                 Cancel
               </button>
 
-              <button
-                className="btn-style save-btn"
-                onClick={async () => {
-                  await api.put(`/users/${profileUserId}/profile`, {
-                    bio: editBio
-                  });
-                  setProfile(prev => ({ ...prev, bio: editBio }));
-                  setShowEdit(false);
-                }}
-              >
-                Save
-              </button>
+             <button
+               className="btn-style save-btn"
+               onClick={async () => {
+
+                 await api.put(`/users/${profileUserId}/profile`, {
+                   username: editUsername,
+                   bio: editBio
+                 });
+
+                 setProfile(prev => ({
+                   ...prev,
+                   username: editUsername,
+                   bio: editBio
+                 }));
+
+                 localStorage.setItem(
+                   "username",
+                   editUsername
+                 );
+
+                 setShowEdit(false);
+
+               }}
+             >
+               Save
+             </button>
             </div>
           </div>
         </div>

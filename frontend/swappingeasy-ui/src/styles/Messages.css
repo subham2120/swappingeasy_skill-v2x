@@ -122,10 +122,11 @@
 }
 
 .message-bubble{
-    max-width:70%;
-    padding:12px 18px;
+    max-width:250px;
+    width:fit-content;
+    padding:10px 14px;
+    font-size:14px;
     border-radius:20px;
-    font-size:15px;
     box-shadow:0 3px 10px rgba(0,0,0,.08);
     position:relative;
 }
@@ -144,6 +145,20 @@
     background:white;
     color:#222;
     border-bottom-left-radius:6px;
+}
+.message-time{
+    font-size:11px;
+    margin-top:4px;
+    text-align:right;
+    opacity:.8;
+}
+
+.message-bubble.sent .message-time{
+    color:rgba(255,255,255,.8);
+}
+
+.message-bubble.received .message-time{
+    color:#666;
 }
 
 /* INPUT */
