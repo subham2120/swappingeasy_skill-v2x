@@ -71,7 +71,11 @@ return ( <div className="sidebar">
 
 
  <Item icon={<FaHome />} label="Home" path="/" />
- <Item icon={<FaUser />} label="Profile" path="/profile" />
+<Item
+  icon={<FaUser />}
+  label="Profile"
+  onClick={() => protectedNavigate("/profile")}
+/>
 
 <Item
   icon={<FaComments />}
